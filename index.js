@@ -28,9 +28,8 @@ async function run(postcode, radius) {
     'https://familyservices.barnet.gov.uk/PublicEnquiry/Search.aspx?searchID=4'
   );
   await search(page, postcode, radius);
-  console.log('scraping page 1');
-  await page.waitForNavigation();
 
+  await page.waitForNavigation();
   const pages = await page.evaluate(() => {
     const results =
       parseInt($('.pager-text')[0].textContent.replace(/\D/g, ''));
@@ -38,15 +37,16 @@ async function run(postcode, radius) {
   });
 
   await promisify(appendFile)('results.html', await scrape(page), 'utf-8');
+  console.log(`scraped page 1/${pages}`);
 
   for (let i = 2; i <= pages; i++) {
-    console.log(`scraping page ${i}`);
     await page.evaluate(
       (i) => __doPostBack(`ctl00$ContentPlaceHolder1$topPager$${i}`,''),
       i
     );
     await page.waitForNavigation();
     await promisify(appendFile)(`results.html`, await scrape(page), 'utf-8');
+    console.log(`scraped page ${i}/${pages}`);
   }
 
   browser.close();
