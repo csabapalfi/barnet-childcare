@@ -1,5 +1,7 @@
 # Barnet childcare by location
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/csabapalfi/barnet-childcare.svg)](https://greenkeeper.io/)
+
 Finding a nursery in London is tricky.
 
 This is a script to scrape [London Borough of Barnet - Childcare by location search](https://familyservices.barnet.gov.uk/PublicEnquiry/Search.aspx?searchID=4) as it's really slow and returns 5 results per page.
