@@ -24,15 +24,27 @@ async function run(postcode, radius) {
 
   await promisify(writeFile)('results.html', '<table>', 'utf-8');
 
-  await page.goto('https://familyservices.barnet.gov.uk/PublicEnquiry/Search.aspx?searchID=4');
+  await page.goto(
+    'https://familyservices.barnet.gov.uk/PublicEnquiry/Search.aspx?searchID=4'
+  );
   await search(page, postcode, radius);
   console.log('scraping page 1');
   await page.waitForNavigation();
+
+  const pages = await page.evaluate(() => {
+    const results =
+      parseInt($('.pager-text')[0].textContent.replace(/\D/g, ''));
+    return Math.ceil(results / 5);
+  });
+
   await promisify(appendFile)('results.html', await scrape(page), 'utf-8');
 
-  for (let i = 2; i <= 115; i++) {
+  for (let i = 2; i <= pages; i++) {
     console.log(`scraping page ${i}`);
-    await page.evaluate((i) => __doPostBack(`ctl00$ContentPlaceHolder1$topPager$${i}`,''), i);
+    await page.evaluate(
+      (i) => __doPostBack(`ctl00$ContentPlaceHolder1$topPager$${i}`,''),
+      i
+    );
     await page.waitForNavigation();
     await promisify(appendFile)(`results.html`, await scrape(page), 'utf-8');
   }
